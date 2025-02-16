@@ -9,15 +9,18 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout do repositório de Paulo
+      - name: Checkout do repositório do Paulo
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Adicionar remote do repositório de destino
+      - name: Clonar repositório de destino (MrBElga/ComputerGraphics)
         run: |
-          git remote add target https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/MrBElga/ComputerGraphics.git
-          git fetch target
+          git config --global url."https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com".insteadOf "https://github.com"
+          git clone https://github.com/MrBElga/ComputerGraphics.git target-repo
+          cd target-repo
+          git config user.name "MrBElga"
+          git config user.email "danieleliasrumin@gmail.com"
 
       - name: Copiar mudanças para o repositório de destino
         run: |
