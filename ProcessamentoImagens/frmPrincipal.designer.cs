@@ -21,12 +21,15 @@
             this.btnAbrirImagem = new System.Windows.Forms.Button();
             this.btnLimpar = new System.Windows.Forms.Button();
             this.menuLateralPanel = new System.Windows.Forms.Panel();
+            this.tbCoordinates = new System.Windows.Forms.TextBox();
             this.btnLuminanciaComDMA = new System.Windows.Forms.Button();
             this.btnNegativoComDMA = new System.Windows.Forms.Button();
             this.pictureBoxPanel = new System.Windows.Forms.Panel();
             this.pictBoxImg = new System.Windows.Forms.PictureBox();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.tbCoordinates = new System.Windows.Forms.TextBox();
+            this.tbHSI = new System.Windows.Forms.TextBox();
+            this.tbCMY = new System.Windows.Forms.TextBox();
+            this.tbRGB = new System.Windows.Forms.TextBox();
             this.menuSuperiorPanel.SuspendLayout();
             this.menuLateralPanel.SuspendLayout();
             this.pictureBoxPanel.SuspendLayout();
@@ -67,6 +70,9 @@
             // menuLateralPanel
             // 
             this.menuLateralPanel.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.menuLateralPanel.Controls.Add(this.tbRGB);
+            this.menuLateralPanel.Controls.Add(this.tbCMY);
+            this.menuLateralPanel.Controls.Add(this.tbHSI);
             this.menuLateralPanel.Controls.Add(this.tbCoordinates);
             this.menuLateralPanel.Controls.Add(this.btnLuminanciaComDMA);
             this.menuLateralPanel.Controls.Add(this.btnNegativoComDMA);
@@ -75,6 +81,16 @@
             this.menuLateralPanel.Name = "menuLateralPanel";
             this.menuLateralPanel.Size = new System.Drawing.Size(200, 558);
             this.menuLateralPanel.TabIndex = 1;
+            // 
+            // tbCoordinates
+            // 
+            this.tbCoordinates.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.tbCoordinates.Location = new System.Drawing.Point(0, 538);
+            this.tbCoordinates.Name = "tbCoordinates";
+            this.tbCoordinates.Size = new System.Drawing.Size(200, 20);
+            this.tbCoordinates.TabIndex = 112;
+            this.tbCoordinates.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.tbCoordinates.UseWaitCursor = true;
             // 
             // btnLuminanciaComDMA
             // 
@@ -119,15 +135,35 @@
             this.pictBoxImg.TabStop = false;
             this.pictBoxImg.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictBoxImg_MouseMove);
             // 
-            // tbCoordinates
+            // tbHSI
             // 
-            this.tbCoordinates.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.tbCoordinates.Location = new System.Drawing.Point(0, 538);
-            this.tbCoordinates.Name = "tbCoordinates";
-            this.tbCoordinates.Size = new System.Drawing.Size(200, 20);
-            this.tbCoordinates.TabIndex = 112;
-            this.tbCoordinates.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.tbCoordinates.UseWaitCursor = true;
+            this.tbHSI.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.tbHSI.Location = new System.Drawing.Point(0, 518);
+            this.tbHSI.Name = "tbHSI";
+            this.tbHSI.Size = new System.Drawing.Size(200, 20);
+            this.tbHSI.TabIndex = 113;
+            this.tbHSI.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.tbHSI.UseWaitCursor = true;
+            // 
+            // tbCMY
+            // 
+            this.tbCMY.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.tbCMY.Location = new System.Drawing.Point(0, 498);
+            this.tbCMY.Name = "tbCMY";
+            this.tbCMY.Size = new System.Drawing.Size(200, 20);
+            this.tbCMY.TabIndex = 114;
+            this.tbCMY.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.tbCMY.UseWaitCursor = true;
+            // 
+            // tbRGB
+            // 
+            this.tbRGB.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.tbRGB.Location = new System.Drawing.Point(0, 478);
+            this.tbRGB.Name = "tbRGB";
+            this.tbRGB.Size = new System.Drawing.Size(200, 20);
+            this.tbRGB.TabIndex = 115;
+            this.tbRGB.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.tbRGB.UseWaitCursor = true;
             // 
             // frmPrincipal
             // 
@@ -162,5 +198,8 @@
         private System.Windows.Forms.Button btnLuminanciaComDMA;
         private System.Windows.Forms.Button btnNegativoComDMA;
         private System.Windows.Forms.TextBox tbCoordinates;
+        private System.Windows.Forms.TextBox tbRGB;
+        private System.Windows.Forms.TextBox tbCMY;
+        private System.Windows.Forms.TextBox tbHSI;
     }
 }
