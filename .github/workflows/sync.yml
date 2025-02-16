@@ -21,8 +21,17 @@ jobs:
 
       - name: Copiar mudanças para o repositório de destino
         run: |
+          # Pega o autor do último commit
           LAST_COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an <%ae>')
-          rsync -av --exclude='.git' . ./
+          
+          # Sincroniza os arquivos para a pasta do repositório de destino
+          rsync -av --exclude='.git' ./ target-repo/
+          
+          cd target-repo
+          
+          # Adiciona as mudanças e faz o commit com o autor correto
           git add .
           git commit --author="$LAST_COMMIT_AUTHOR" -m "Sync automático do repo do Paulo" || echo "Nenhuma mudança para commitar"
+          
+          # Empurra as mudanças para o repositório de destino
           git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/MrBElga/ComputerGraphics.git main
