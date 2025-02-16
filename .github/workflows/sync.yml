@@ -3,7 +3,7 @@ name: Sync with MrBElga Repo
 on:
   push:
     branches:
-      - main  # Altere se o branch principal for outro
+      - main  
 
 jobs:
   sync:
@@ -12,26 +12,24 @@ jobs:
       - name: Checkout do repositório de Paulo
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Pega o histórico completo, para poder ver os autores dos commits anteriores
+          fetch-depth: 0  
 
       - name: Configurar o repositório de destino
         run: |
+          # Adiciona o remote para o repositório de destino com o token de acesso
           git remote add target https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/MrBElga/ComputerGraphics.git
           git fetch target
 
       - name: Copiar mudanças para o repositório de destino
         run: |
-          # Pega o autor do último commit
+          # Sincroniza os arquivos
           LAST_COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an <%ae>')
-          
-          # Sincroniza os arquivos para a pasta do repositório de destino
           rsync -av --exclude='.git' ./ target-repo/
           
           cd target-repo
           
-          # Adiciona as mudanças e faz o commit com o autor correto
+
           git add .
           git commit --author="$LAST_COMMIT_AUTHOR" -m "Sync automático do repo do Paulo" || echo "Nenhuma mudança para commitar"
-          
-          # Empurra as mudanças para o repositório de destino
+
           git push https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/MrBElga/ComputerGraphics.git main
