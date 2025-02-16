@@ -13,24 +13,28 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          path: source-repo  # Clona em um diretório específico
 
       - name: Clonar repositório de destino (MrBElga/ComputerGraphics)
         run: |
-          # Remove o diretório de trabalho atual para evitar conflitos
-          rm -rf *
-          rm -rf .git
+          # Remove o diretório de destino se já existir
+          rm -rf dest-repo
           
-          # Clona o repositório de destino diretamente no diretório de trabalho
-          git clone https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/MrBElga/ComputerGraphics.git .
+          # Clona o repositório de destino em um diretório separado
+          git clone https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/MrBElga/ComputerGraphics.git dest-repo
+          
+          # Configura usuário do Git
+          cd dest-repo
           git config user.name "MrBElga"
           git config user.email "danieleliasrumin@gmail.com"
 
       - name: Copiar mudanças do repositório de origem para o destino
         run: |
-          # Copia os arquivos do repositório de origem para o diretório de trabalho
-          rsync -av --exclude='.git' ../repo-origem/ .
+          # Copia os arquivos do repositório de origem para o diretório do repositório de destino
+          rsync -av --exclude='.git' source-repo/ dest-repo/
           
-          # Adiciona as mudanças e faz o commit
+          # Comita e envia as mudanças
+          cd dest-repo
           git add .
           git commit -m "Sync automático do repo do Paulo" || echo "Nenhuma mudança para commitar"
           git push origin main
