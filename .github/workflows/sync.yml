@@ -16,7 +16,7 @@ jobs:
 
       - name: Clonar repositório de destino (MrBElga/ComputerGraphics)
         run: |
-          git clone https://github.com/MrBElga/ComputerGraphics.git target-repo
+          git clone https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/MrBElga/ComputerGraphics.git target-repo
           cd target-repo
           git config user.name "MrBElga"
           git config user.email "danieleliasrumin@gmail.com"
