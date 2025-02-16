@@ -26,23 +26,14 @@ namespace ProcessamentoImagens
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 image = Image.FromFile(openFileDialog.FileName);
-                pictBoxImg1.Image = image;
-                pictBoxImg1.SizeMode = PictureBoxSizeMode.Normal;
+                pictBoxImg.Image = image;
+                pictBoxImg.SizeMode = PictureBoxSizeMode.Normal;
             }
         }
 
         private void btnLimpar_Click(object sender, EventArgs e)
         {
-            pictBoxImg1.Image = null;
-            pictBoxImg2.Image = null;
-        }
-
-        private void btnLuminanciaSemDMA_Click(object sender, EventArgs e)
-        {
-            Bitmap imgDest = new Bitmap(image);
-            imageBitmap = (Bitmap)image;
-            Filtros.convert_to_gray(imageBitmap, imgDest);
-            pictBoxImg2.Image = imgDest;
+            pictBoxImg.Image = null;
         }
 
         private void btnLuminanciaComDMA_Click(object sender, EventArgs e)
@@ -50,15 +41,7 @@ namespace ProcessamentoImagens
             Bitmap imgDest = new Bitmap(image);
             imageBitmap = (Bitmap)image;
             Filtros.convert_to_grayDMA(imageBitmap, imgDest);
-            pictBoxImg2.Image = imgDest;
-        }
-
-        private void btnNegativoSemDMA_Click(object sender, EventArgs e)
-        {
-            Bitmap imgDest = new Bitmap(image);
-            imageBitmap = (Bitmap)image;
-            Filtros.negativo(imageBitmap, imgDest);
-            pictBoxImg2.Image = imgDest;
+            pictBoxImg.Image = imgDest;
         }
 
         private void btnNegativoComDMA_Click(object sender, EventArgs e)
@@ -66,7 +49,24 @@ namespace ProcessamentoImagens
             Bitmap imgDest = new Bitmap(image);
             imageBitmap = (Bitmap)image;
             Filtros.negativoDMA(imageBitmap, imgDest);
-            pictBoxImg2.Image = imgDest;
+            pictBoxImg.Image = imgDest;
+        }
+
+        private void frmPrincipal_Load(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Maximized; // Define a janela como maximizada
+        }
+
+        private void pictBoxImg_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.X >= 0 && e.X < pictBoxImg.Image.Width && e.Y >= 0 && e.Y < pictBoxImg.Image.Height)
+            {
+                tbCoordinates.Text = $"X: {e.X}, Y: {e.Y}";
+            }
+            else
+            {
+                tbCoordinates.Text = string.Empty;
+            }
         }
     }
 }

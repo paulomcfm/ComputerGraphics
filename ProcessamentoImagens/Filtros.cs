@@ -9,60 +9,6 @@ namespace ProcessamentoImagens
 {
     class Filtros
     {
-        //sem acesso direto a memoria
-        public static void convert_to_gray(Bitmap imageBitmapSrc, Bitmap imageBitmapDest)
-        {
-            int width = imageBitmapSrc.Width;
-            int height = imageBitmapSrc.Height;
-            int r, g, b;
-            Int32 gs;
-
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    //obtendo a cor do pixel
-                    Color cor = imageBitmapSrc.GetPixel(x, y);
-
-                    r = cor.R;
-                    g = cor.G;
-                    b = cor.B;
-                    gs = (Int32)(r * 0.2990 + g * 0.5870 + b * 0.1140);
-
-                    //nova cor
-                    Color newcolor = Color.FromArgb(gs, gs, gs);
-
-                    imageBitmapDest.SetPixel(x, y, newcolor);
-                }
-            }
-        }
-
-        //sem acesso direito a memoria
-        public static void negativo(Bitmap imageBitmapSrc, Bitmap imageBitmapDest)
-        {
-            int width = imageBitmapSrc.Width;
-            int height = imageBitmapSrc.Height;
-            int r, g, b;
-
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    //obtendo a cor do pixel
-                    Color cor = imageBitmapSrc.GetPixel(x, y);
-
-                    r = cor.R;
-                    g = cor.G;
-                    b = cor.B;
-
-                    //nova cor
-                    Color newcolor = Color.FromArgb(255 - r, 255 - g, 255 - b);
-
-                    imageBitmapDest.SetPixel(x, y, newcolor);
-                }
-            }
-        }
-
         //com acesso direto a memória
         public static void convert_to_grayDMA(Bitmap imageBitmapSrc, Bitmap imageBitmapDest)
         {
