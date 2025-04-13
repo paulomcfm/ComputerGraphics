@@ -11,60 +11,60 @@ using System.Windows.Forms.VisualStyles;
 
 namespace ProcessamentoImagens._2D
 {
-    class Polygon
+    class Poligono
     {
         private List<Point> vertices;
 
-        public Polygon()
+        public Poligono()
         {
             this.vertices = new List<Point>();
         }
 
         public List<Point> Vertices { get => this.vertices; set => this.vertices = value; }
 
-        public void AddVertice(int x, int y)
+        public void AdicionarVértice(int x, int y)
         {
             this.vertices.Add(new Point(x, y));
         }
 
-        public void SetPixel(int x, int y, Color cor, BitmapData data)
+        public void DefinirPixel(int x, int y, Color cor, BitmapData dados)
         {
-            int stride = data.Stride;
+            int stride = dados.Stride;
             unsafe
             {
-                byte* pointer = (byte*)data.Scan0.ToPointer();
-                byte* init = pointer;
-                pointer = (byte*)(init + (y * stride) + (x * 3));
-                *(pointer++) = cor.B;
-                *(pointer++) = cor.G;
-                *(pointer++) = cor.R;
+                byte* ponteiro = (byte*)dados.Scan0.ToPointer();
+                byte* início = ponteiro;
+                ponteiro = (byte*)(início + (y * stride) + (x * 3));
+                *(ponteiro++) = cor.B;
+                *(ponteiro++) = cor.G;
+                *(ponteiro++) = cor.R;
             }
         }
 
-        public Color GetPixel(int x, int y, BitmapData data)
+        public Color ObterPixel(int x, int y, BitmapData dados)
         {
-            int stride = data.Stride;
+            int stride = dados.Stride;
             int[] p = new int[3];
             unsafe
             {
-                byte* pointer = (byte*)data.Scan0.ToPointer();
-                byte* init = pointer;
-                pointer = (byte*)(init + (y * stride) + (x * 3));
-                p[0] = *(pointer++);
-                p[1] = *(pointer++);
-                p[2] = *(pointer++);
+                byte* ponteiro = (byte*)dados.Scan0.ToPointer();
+                byte* início = ponteiro;
+                ponteiro = (byte*)(início + (y * stride) + (x * 3));
+                p[0] = *(ponteiro++);
+                p[1] = *(ponteiro++);
+                p[2] = *(ponteiro++);
             }
             return Color.FromArgb(p[0], p[1], p[2]);
         }
 
-        public Bitmap Erase(Bitmap img)
+        public Bitmap Apagar(Bitmap img)
         {
-            return this.ReDraw(img, Color.White);
+            return this.ReDesenhar(img, Color.White);
         }
 
-        public Bitmap TerminatedPolygon(Bitmap img, Color cor)
+        public Bitmap PolígonoTerminado(Bitmap img, Color cor)
         {
-            img = Draws.DrawLine.DDA(img,
+            img = Desenhos.DesenharLinha.DDA(img,
                 this.vertices[this.vertices.Count - 1].X,
                 this.vertices[this.vertices.Count - 1].Y,
                 this.vertices[0].X,
@@ -73,23 +73,23 @@ namespace ProcessamentoImagens._2D
             return img;
         }
 
-        public Bitmap ReDraw(Bitmap img, Color cor, bool terminated = true)
+        public Bitmap ReDesenhar(Bitmap img, Color cor, bool terminado = true)
         {
             for (int i = 0; i < this.vertices.Count - 1; i++)
-                img = Draws.DrawLine.DDA(img,
+                img = Desenhos.DesenharLinha.DDA(img,
                     this.vertices[i].X,
                     this.vertices[i].Y,
                     this.vertices[i + 1].X,
                     this.vertices[i + 1].Y,
                     cor);
-            return (terminated) ? this.TerminatedPolygon(img, cor) : img;
+            return (terminado) ? this.PolígonoTerminado(img, cor) : img;
         }
 
-        public Point GetSeed()
+        public Point ObterSemente()
         {
             double xmed = 0;
             double ymed = 0;
-            int count = 0;
+            int contagem = 0;
 
             for (int i = 0; i < this.vertices.Count - 1; i++)
             {
@@ -99,143 +99,19 @@ namespace ProcessamentoImagens._2D
                 );
                 xmed += p.X;
                 ymed += p.Y;
-                count++;
+                contagem++;
             }
             xmed += (this.vertices[this.vertices.Count - 1].X + this.vertices[0].X) / 2;
             ymed += (this.vertices[this.vertices.Count - 1].Y + this.vertices[0].Y) / 2;
-            count++;
-            xmed /= count;
-            ymed /= count;
+            contagem++;
+            xmed /= contagem;
+            ymed /= contagem;
             return new Point((int)xmed, (int)ymed);
         }
 
-        public Bitmap FloodFill(Bitmap img, Color inside)
+        public Bitmap Rotação(Bitmap img, Color cor, int angle)
         {
-            int width = img.Width;
-            int height = img.Height;
-            BitmapData data = img.LockBits(new Rectangle(0, 0, img.Width, img.Height),
-                ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-            unsafe
-            {
-                Stack<Point> stack = new Stack<Point>();
-                Color back = this.GetPixel(this.GetSeed().X, this.GetSeed().Y, data);
-                stack.Push(this.GetSeed());
-                while (stack.Count > 0)
-                {
-                    Point p = stack.Pop();
-                    if (p.X < width && p.X > 0 && p.Y < height && p.Y > 0)
-                    {
-                        Color cor = this.GetPixel(p.X, p.Y, data);
-                        if (cor == back)
-                        {
-                            this.SetPixel(p.X, p.Y, inside, data);
-                            stack.Push(new Point(p.X + 1, p.Y));
-                            stack.Push(new Point(p.X, p.Y + 1));
-                            stack.Push(new Point(p.X - 1, p.Y));
-                            stack.Push(new Point(p.X, p.Y - 1));
-                        }
-                    }
-                }
-            }
-            img.UnlockBits(data);
-            return img;
-        }
-
-        public Bitmap Translation(Bitmap img, Color cor, Point p)
-        {
-            img = this.Erase(img);
-            double[][] M1 = new double[3][];
-            M1[0] = new double[3];
-            M1[1] = new double[3];
-            M1[2] = new double[3];
-            M1[0][0] = 1; M1[0][1] = 0; M1[0][2] = p.X;
-            M1[1][0] = 0; M1[1][1] = 1; M1[1][2] = p.Y;
-            M1[2][0] = 0; M1[2][1] = 0; M1[2][2] = 1;
-            //
-            for (int i = 0; i < this.vertices.Count; i++)
-            {
-                double[] M2 = new double[3];
-                M2[0] = this.vertices[i].X;
-                M2[1] = this.vertices[i].Y;
-                M2[2] = 1;
-                double[] M = Matrix.Homogenar(M1, M2);
-                this.vertices[i] = new Point((int)M[0], (int)M[1]);
-            }
-            return this.ReDraw(img, cor);
-        }
-
-        public Bitmap Translation(Bitmap img, Color cor, int desloc)
-        {
-            img = this.Erase(img);
-            double[][] M1 = new double[3][];
-            M1[0] = new double[3];
-            M1[1] = new double[3];
-            M1[2] = new double[3];
-            M1[0][0] = 1; M1[0][1] = 0; M1[0][2] = desloc;
-            M1[1][0] = 0; M1[1][1] = 1; M1[1][2] = desloc;
-            M1[2][0] = 0; M1[2][1] = 0; M1[2][2] = 1;
-            //
-            for (int i = 0; i < this.vertices.Count; i++)
-            {
-                double[] M2 = new double[3];
-                M2[0] = this.vertices[i].X;
-                M2[1] = this.vertices[i].Y;
-                M2[2] = 1;
-                double[] M = Matrix.Homogenar(M1, M2);
-                this.vertices[i] = new Point((int)M[0], (int)M[1]);
-            }
-            return this.ReDraw(img, cor);
-        }
-
-        public Bitmap Scala(Bitmap img, Color cor, double scala)
-        {
-            img = this.Erase(img);
-            double[][] M1 = new double[3][];
-            M1[0] = new double[3];
-            M1[1] = new double[3];
-            M1[2] = new double[3];
-            M1[0][0] = scala; M1[0][1] = 0; M1[0][2] = 0;
-            M1[1][0] = 0; M1[1][1] = scala; M1[1][2] = 0;
-            M1[2][0] = 0; M1[2][1] = 0; M1[2][2] = 1;
-            //
-            for (int i = 0; i < this.vertices.Count; i++)
-            {
-                double[] M2 = new double[3];
-                M2[0] = this.vertices[i].X;
-                M2[1] = this.vertices[i].Y;
-                M2[2] = 1;
-                double[] M = Matrix.Homogenar(M1, M2);
-                this.vertices[i] = new Point((int)M[0], (int)M[1]);
-            }
-            return this.ReDraw(img, cor);
-        }
-
-        public Bitmap Scala(Bitmap img, Color cor, double x, double y)
-        {
-            img = this.Erase(img);
-            double[][] M1 = new double[3][];
-            M1[0] = new double[3];
-            M1[1] = new double[3];
-            M1[2] = new double[3];
-            M1[0][0] = x; M1[0][1] = 0; M1[0][2] = 0;
-            M1[1][0] = 0; M1[1][1] = y; M1[1][2] = 0;
-            M1[2][0] = 0; M1[2][1] = 0; M1[2][2] = 1;
-            //
-            for (int i = 0; i < this.vertices.Count; i++)
-            {
-                double[] M2 = new double[3];
-                M2[0] = this.vertices[i].X;
-                M2[1] = this.vertices[i].Y;
-                M2[2] = 1;
-                double[] M = Matrix.Homogenar(M1, M2);
-                this.vertices[i] = new Point((int)M[0], (int)M[1]);
-            }
-            return this.ReDraw(img, cor);
-        }
-
-        public Bitmap Rotation(Bitmap img, Color cor, int angle)
-        {
-            img = this.Erase(img);
+            img = this.Apagar(img);
             double[][] M1 = new double[3][];
             M1[0] = new double[3];
             M1[1] = new double[3];
@@ -250,15 +126,93 @@ namespace ProcessamentoImagens._2D
                 M2[0] = this.vertices[i].X;
                 M2[1] = this.vertices[i].Y;
                 M2[2] = 1;
-                double[] M = Matrix.Homogenar(M1, M2);
+                double[] M = Matriz.Homogenar(M1, M2);
                 this.vertices[i] = new Point((int)M[0], (int)M[1]);
             }
-            return this.ReDraw(img, cor);
+            return this.ReDesenhar(img, cor);
         }
 
-        public Bitmap Shear(Bitmap img, Color cor, int alfa, int beta)
+        public Bitmap Preenchimento(Bitmap img, Color dentro)
         {
-            img = this.Erase(img);
+            int largura = img.Width;
+            int altura = img.Height;
+            BitmapData dados = img.LockBits(new Rectangle(0, 0, img.Width, img.Height),
+                ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            unsafe
+            {
+                Stack<Point> pilha = new Stack<Point>();
+                Color fundo = this.ObterPixel(this.ObterSemente().X, this.ObterSemente().Y, dados);
+                pilha.Push(this.ObterSemente());
+                while (pilha.Count > 0)
+                {
+                    Point p = pilha.Pop();
+                    if (p.X < largura && p.X > 0 && p.Y < altura && p.Y > 0)
+                    {
+                        Color cor = this.ObterPixel(p.X, p.Y, dados);
+                        if (cor == fundo)
+                        {
+                            this.DefinirPixel(p.X, p.Y, dentro, dados);
+                            pilha.Push(new Point(p.X + 1, p.Y));
+                            pilha.Push(new Point(p.X, p.Y + 1));
+                            pilha.Push(new Point(p.X - 1, p.Y));
+                            pilha.Push(new Point(p.X, p.Y - 1));
+                        }
+                    }
+                }
+            }
+            img.UnlockBits(dados);
+            return img;
+        }
+
+        public Bitmap Translação(Bitmap img, Color cor, Point p)
+        {
+            img = this.Apagar(img);
+            double[][] M1 = new double[3][];
+            M1[0] = new double[3];
+            M1[1] = new double[3];
+            M1[2] = new double[3];
+            M1[0][0] = 1; M1[0][1] = 0; M1[0][2] = p.X;
+            M1[1][0] = 0; M1[1][1] = 1; M1[1][2] = p.Y;
+            M1[2][0] = 0; M1[2][1] = 0; M1[2][2] = 1;
+            
+            for (int i = 0; i < this.vertices.Count; i++)
+            {
+                double[] M2 = new double[3];
+                M2[0] = this.vertices[i].X;
+                M2[1] = this.vertices[i].Y;
+                M2[2] = 1;
+                double[] M = Matriz.Homogenar(M1, M2);
+                this.vertices[i] = new Point((int)M[0], (int)M[1]);
+            }
+            return this.ReDesenhar(img, cor);
+        }
+
+        public Bitmap Translação(Bitmap img, Color cor, int desloc)
+        {
+            img = this.Apagar(img);
+            double[][] M1 = new double[3][];
+            M1[0] = new double[3];
+            M1[1] = new double[3];
+            M1[2] = new double[3];
+            M1[0][0] = 1; M1[0][1] = 0; M1[0][2] = desloc;
+            M1[1][0] = 0; M1[1][1] = 1; M1[1][2] = desloc;
+            M1[2][0] = 0; M1[2][1] = 0; M1[2][2] = 1;
+            
+            for (int i = 0; i < this.vertices.Count; i++)
+            {
+                double[] M2 = new double[3];
+                M2[0] = this.vertices[i].X;
+                M2[1] = this.vertices[i].Y;
+                M2[2] = 1;
+                double[] M = Matriz.Homogenar(M1, M2);
+                this.vertices[i] = new Point((int)M[0], (int)M[1]);
+            }
+            return this.ReDesenhar(img, cor);
+        }
+
+        public Bitmap Cisalharmento(Bitmap img, Color cor, int alfa, int beta)
+        {
+            img = this.Apagar(img);
             double[][] M1 = new double[3][];
             M1[0] = new double[3];
             M1[1] = new double[3];
@@ -273,21 +227,21 @@ namespace ProcessamentoImagens._2D
                 M2[0] = this.vertices[i].X;
                 M2[1] = this.vertices[i].Y;
                 M2[2] = 1;
-                double[] M = Matrix.Homogenar(M1, M2);
+                double[] M = Matriz.Homogenar(M1, M2);
                 this.vertices[i] = new Point((int)M[0], (int)M[1]);
             }
-            return this.ReDraw(img, cor);
+            return this.ReDesenhar(img, cor);
         }
 
-        public Bitmap Mirror(Bitmap img, Color cor, int flipx = 1, int flipy = 1)
+        public Bitmap Escalar(Bitmap img, Color cor, double scala)
         {
-            img = this.Erase(img);
+            img = this.Apagar(img);
             double[][] M1 = new double[3][];
             M1[0] = new double[3];
             M1[1] = new double[3];
             M1[2] = new double[3];
-            M1[0][0] = flipy; M1[0][1] = 0; M1[0][2] = 0;
-            M1[1][0] = 0; M1[1][1] = flipx; M1[1][2] = 0;
+            M1[0][0] = scala; M1[0][1] = 0; M1[0][2] = 0;
+            M1[1][0] = 0; M1[1][1] = scala; M1[1][2] = 0;
             M1[2][0] = 0; M1[2][1] = 0; M1[2][2] = 1;
             //
             for (int i = 0; i < this.vertices.Count; i++)
@@ -296,40 +250,99 @@ namespace ProcessamentoImagens._2D
                 M2[0] = this.vertices[i].X;
                 M2[1] = this.vertices[i].Y;
                 M2[2] = 1;
-                double[] M = Matrix.Homogenar(M1, M2);
+                double[] M = Matriz.Homogenar(M1, M2);
                 this.vertices[i] = new Point((int)M[0], (int)M[1]);
             }
-            return this.ReDraw(img, cor);
+            return this.ReDesenhar(img, cor);
         }
 
-        public Bitmap ViewPort(Bitmap img, Color cor, int width, int height, int _width, int _height)
+        public Bitmap Escalar(Bitmap img, Color cor, double x, double y)
         {
-            double porcx = Convert.ToDouble((double)_width / width);
-            double porcy = Convert.ToDouble((double)_height / height);
-            Point centro = this.GetSeed();
-            double X = (double)centro.X / width;
-            double Y = (double)centro.Y / height;
-            int centrox = (int)X * _width;
-            int centroy = (int)Y * _height;
-            img = this.Translation(img, cor, new Point(-centrox, -centroy));
-            img = this.Scala(img, cor, porcx, porcy);
-            img = this.Translation(img, cor, new Point(centrox, centroy));
-            return this.ReDraw(img, cor);
+            img = this.Apagar(img);
+            double[][] M1 = new double[3][];
+            M1[0] = new double[3];
+            M1[1] = new double[3];
+            M1[2] = new double[3];
+            M1[0][0] = x; M1[0][1] = 0; M1[0][2] = 0;
+            M1[1][0] = 0; M1[1][1] = y; M1[1][2] = 0;
+            M1[2][0] = 0; M1[2][1] = 0; M1[2][2] = 1;
+            //
+            for (int i = 0; i < this.vertices.Count; i++)
+            {
+                double[] M2 = new double[3];
+                M2[0] = this.vertices[i].X;
+                M2[1] = this.vertices[i].Y;
+                M2[2] = 1;
+                double[] M = Matriz.Homogenar(M1, M2);
+                this.vertices[i] = new Point((int)M[0], (int)M[1]);
+            }
+            return this.ReDesenhar(img, cor);
+        }
+
+        public Bitmap Espelhar(Bitmap img, Color cor, int flipx = 1, int flipy = 1)
+        {
+            img = this.Apagar(img);
+            double[][] M1 = new double[3][];
+            M1[0] = new double[3];
+            M1[1] = new double[3];
+            M1[2] = new double[3];
+            M1[0][0] = flipx; M1[0][1] = 0; M1[0][2] = 0;
+            M1[1][0] = 0; M1[1][1] = flipy; M1[1][2] = 0;
+            M1[2][0] = 0; M1[2][1] = 0; M1[2][2] = 1;
+            
+            for (int i = 0; i < this.vertices.Count; i++)
+            {
+                double[] M2 = new double[3];
+                M2[0] = this.vertices[i].X;
+                M2[1] = this.vertices[i].Y;
+                M2[2] = 1;
+                double[] M = Matriz.Homogenar(M1, M2);
+                this.vertices[i] = new Point((int)M[0], (int)M[1]);
+            }
+            return this.ReDesenhar(img, cor);
+        }
+
+        public Bitmap ViewPort(Bitmap img, Color cor, int largura, int altura, int _largura, int _altura)
+        {
+            img = this.Apagar(img);
+            double[][] M1 = new double[3][];
+            M1[0] = new double[3];
+            M1[1] = new double[3];
+            M1[2] = new double[3];
+            M1[0][0] = (double)_largura / largura; M1[0][1] = 0; M1[0][2] = 0;
+            M1[1][0] = 0; M1[1][1] = (double)_altura / altura; M1[1][2] = 0;
+            M1[2][0] = 0; M1[2][1] = 0; M1[2][2] = 1;
+            
+            for (int i = 0; i < this.vertices.Count; i++)
+            {
+                double[] M2 = new double[3];
+                M2[0] = this.vertices[i].X;
+                M2[1] = this.vertices[i].Y;
+                M2[2] = 1;
+                double[] M = Matriz.Homogenar(M1, M2);
+                this.vertices[i] = new Point((int)M[0], (int)M[1]);
+            }
+            return this.ReDesenhar(img, cor);
         }
 
         public override string ToString()
         {
-            return this.GetHashCode() + " - " + this.vertices.Count + " vértices";
+            StringBuilder sb = new StringBuilder();
+            foreach (Point p in this.vertices)
+            {
+                sb.Append($"({p.X}, {p.Y}) ");
+            }
+            return sb.ToString();
         }
 
-        public Polygon GetClone()
+        public Poligono ObterClone()
         {
-            Polygon p = new Polygon();
-            foreach (Point point in this.vertices)
+            Poligono clone = new Poligono();
+            foreach (Point p in this.vertices)
             {
-                p.AddVertice(point.X, point.Y);
+                clone.AdicionarVértice(p.X, p.Y);
             }
-            return p;
+            return clone;
         }
     }
 }

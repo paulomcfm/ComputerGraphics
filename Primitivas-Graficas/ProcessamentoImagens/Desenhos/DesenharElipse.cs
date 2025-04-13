@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Drawing;
 
-namespace ProcessamentoImagens.Draws
+namespace ProcessamentoImagens.Desenhos
 {
-    class DrawEllipse
+    class DesenharElipse
     {
-        public static Bitmap Midpoint(Bitmap img, int x1, int y1, int x2, int y2, Color cor)
+        public static Bitmap PontoMedio(Bitmap img, int x1, int y1, int x2, int y2, Color cor)
         {
             Bitmap btm = new Bitmap(img);
 
@@ -24,7 +24,7 @@ namespace ProcessamentoImagens.Draws
 
             while (dx < dy)
             {
-                DrawEllipse.Draw(btm, (int)Math.Round(x), (int)Math.Round(y), (int)Math.Round(cx), (int)Math.Round(cy), cor);
+                DesenharElipse.Desenhar(btm, (int)Math.Round(x), (int)Math.Round(y), (int)Math.Round(cx), (int)Math.Round(cy), cor);
                 if (d1 < 0)
                 {
                     x++;
@@ -41,13 +41,13 @@ namespace ProcessamentoImagens.Draws
                 }
             }
 
-            double d2 = (Math.Pow(ry, 2) * ((x + 0.5) * (x + 0.5))) 
-                + (Math.Pow(rx, 2) * ((y - 1) * (y - 1))) 
+            double d2 = (Math.Pow(ry, 2) * ((x + 0.5) * (x + 0.5)))
+                + (Math.Pow(rx, 2) * ((y - 1) * (y - 1)))
                 - Math.Pow(rx, 2) * Math.Pow(ry, 2);
 
             while (y >= 0)
             {
-                DrawEllipse.Draw(btm, (int)Math.Round(x), (int)Math.Round(y), (int)Math.Round(cx), (int)Math.Round(cy), cor);
+                DesenharElipse.Desenhar(btm, (int)Math.Round(x), (int)Math.Round(y), (int)Math.Round(cx), (int)Math.Round(cy), cor);
                 if (d2 > 0)
                 {
                     y--;
@@ -66,16 +66,16 @@ namespace ProcessamentoImagens.Draws
             return btm;
         }
 
-        public static Bitmap Draw(Bitmap img, int x, int y, int cx, int cy, Color cor)
+        public static Bitmap Desenhar(Bitmap img, int x, int y, int cx, int cy, Color cor)
         {
             if (x + cx > 0 && x + cx < img.Width && y + cy > 0 && y + cy < img.Height)
-                Paint.Draw(img, x + cx, y + cy, cor);
+                Pintar.Desenhar(img, x + cx, y + cy, cor);
             if (NEG(x) + cx > 0 && NEG(x) + cx < img.Width && y + cy > 0 && y + cy < img.Height)
-                Paint.Draw(img, NEG(x) + cx, y + cy, cor);
+                Pintar.Desenhar(img, NEG(x) + cx, y + cy, cor);
             if (x + cx > 0 && x + cx < img.Width && NEG(y) + cy > 0 && NEG(y) + cy < img.Height)
-                Paint.Draw(img, x + cx, NEG(y) + cy, cor);
+                Pintar.Desenhar(img, x + cx, NEG(y) + cy, cor);
             if (NEG(x) + cx > 0 && NEG(x) + cx < img.Width && NEG(y) + cy > 0 && NEG(y) + cy < img.Height)
-                Paint.Draw(img, NEG(x) + cx, NEG(y) + cy, cor);
+                Pintar.Desenhar(img, NEG(x) + cx, NEG(y) + cy, cor);
             return img;
         }
 

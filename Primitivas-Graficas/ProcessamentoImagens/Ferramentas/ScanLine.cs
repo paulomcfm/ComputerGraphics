@@ -1,4 +1,5 @@
 ﻿using ProcessamentoImagens._2D;
+using ProcessamentoImagens.Tools;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,34 +9,34 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProcessamentoImagens.Tools
+namespace ProcessamentoImagens.Ferramentas
 {
     class ScanLine
     {
-        private Polygon poly;
+        private Poligono polígono;
         private List<List<Aresta>> ET;
         private List<Aresta> AET;
 
-        public ScanLine(Polygon p)
+        public ScanLine(Poligono p)
         {
-            this.poly = p;
+            this.polígono = p;
         }
 
-        private int GetMaxY()
+        private int ObterMaxY()
         {
             int m = 0;
-            for (int i = 0; i < poly.Vertices.Count; i++)
-                m = Math.Max(m, poly.Vertices[i].Y);
+            for (int i = 0; i < polígono.Vertices.Count; i++)
+                m = Math.Max(m, polígono.Vertices[i].Y);
             return m;
         }
 
         private void InitET(int maxY)
         {
-            for(int i = 0; i < maxY + 1; i++)
+            for (int i = 0; i < maxY + 1; i++)
                 this.ET.Add(new List<Aresta>());
         }
 
-        private int GetFirtsNotEmpty()
+        private int ObterPrimeiroNãoVazio()
         {
             bool flag = true;
             int i;
@@ -44,78 +45,78 @@ namespace ProcessamentoImagens.Tools
             return i - 1;
         }
 
-        private void RemoveMaxEqualY(int y)
+        private void RemoverMaxEqualY(int y)
         {
-            ArrayList remove = new ArrayList();
+            ArrayList remover = new ArrayList();
             foreach (Aresta arr in this.AET)
                 if (arr.MaxY == y)
-                    remove.Add(arr);
-            foreach (Aresta arr in remove)
+                    remover.Add(arr);
+            foreach (Aresta arr in remover)
                 this.AET.Remove(arr);
         }
 
-        private void AttX()
+        private void AtualizarX()
         {
             foreach (Aresta arr in this.AET)
-                arr.Add();
+                arr.Adicionar();
         }
 
-        private void AddAET(int index)
+        private void AdicionarAET(int index)
         {
-            List<Aresta> list = ET[index];
-            foreach (Aresta arr in list)
+            List<Aresta> lista = ET[index];
+            foreach (Aresta arr in lista)
                 this.AET.Add(arr);
         }
 
-        private void BuildET()
+        private void ConstruirET()
         {
             this.ET = new List<List<Aresta>>();
-            this.InitET(this.GetMaxY());
+            this.InitET(this.ObterMaxY());
             int maxY, minY, maxX, minX;
             double inc, dx, dy;
-            for(int i = 0; i < this.poly.Vertices.Count - 1; i++)
+            for (int i = 0; i < this.polígono.Vertices.Count - 1; i++)
             {
-                if(this.poly.Vertices[i].Y > this.poly.Vertices[i + 1].Y)
+                if (this.polígono.Vertices[i].Y > this.polígono.Vertices[i + 1].Y)
                 {
-                    maxX = this.poly.Vertices[i].X;
-                    minX = this.poly.Vertices[i + 1].X;
-                    maxY = this.poly.Vertices[i].Y;
-                    minY = this.poly.Vertices[i + 1].Y;
+                    maxX = this.polígono.Vertices[i].X;
+                    minX = this.polígono.Vertices[i + 1].X;
+                    maxY = this.polígono.Vertices[i].Y;
+                    minY = this.polígono.Vertices[i + 1].Y;
                 }
                 else
                 {
-                    maxX = this.poly.Vertices[i + 1].X;
-                    minX = this.poly.Vertices[i].X;
-                    maxY = this.poly.Vertices[i + 1].Y;
-                    minY = this.poly.Vertices[i].Y;
+                    maxX = this.polígono.Vertices[i + 1].X;
+                    minX = this.polígono.Vertices[i].X;
+                    maxY = this.polígono.Vertices[i + 1].Y;
+                    minY = this.polígono.Vertices[i].Y;
                 }
                 //
                 dx = maxX - minX;
                 dy = maxY - minY;
                 inc = dx / dy;
                 //
-                if(double.IsInfinity(inc))
+                if (double.IsInfinity(inc))
                 {
                     inc = 1;
                 }
                 Aresta arr = new Aresta(maxY, minX, inc);
                 this.ET[minY].Add(arr);
             }
-            if(this.poly.Vertices.Count > 2)
+            if (this.polígono.Vertices.Count > 2)
             {
-                if (this.poly.Vertices[0].Y > this.poly.Vertices[this.poly.Vertices.Count - 1].Y)
+                if (this.polígono.Vertices[0].Y > this.polígono.Vertices[this.polígono.Vertices.Count - 1].Y)
                 {
-                    maxX = this.poly.Vertices[0].X;
-                    minX = this.poly.Vertices[this.poly.Vertices.Count - 1].X;
-                    maxY = this.poly.Vertices[0].Y;
-                    minY = this.poly.Vertices[this.poly.Vertices.Count - 1].Y;
+                    maxX = this.polígono.Vertices[0].X;
+                    minX = this.polígono.Vertices[this.polígono.Vertices.Count - 1].X;
+                    maxY = this.polígono.Vertices[0].Y;
+                    minY = this.polígono.Vertices[this.polígono.Vertices.Count - 1].Y;
                 }
                 else
                 {
-                    maxX = this.poly.Vertices[this.poly.Vertices.Count - 1].X;
-                    minX = this.poly.Vertices[0].X;
-                    maxY = this.poly.Vertices[this.poly.Vertices.Count - 1].Y;
-                    minY = this.poly.Vertices[0].Y;
+                    maxX = this.polígono.Vertices[this.polígono.Vertices.Count - 1].X;
+                    minX = this.polígono.Vertices[0].X;
+                    maxY = this.polígono.Vertices[this.polígono.Vertices.Count - 1].Y;
+                    minY = this.polígono.Vertices[0].Y;
                 }
                 //
                 dx = maxX - minX;
@@ -131,41 +132,41 @@ namespace ProcessamentoImagens.Tools
             }
         }
 
-        private void Fill(Color cor, BitmapData data)
+        private void Preencher(Color cor, BitmapData data)
         {
             int y;
-            this.BuildET();
+            this.ConstruirET();
             Aresta arr1, arr2;
             this.AET = new List<Aresta>();
-            int pc = this.GetFirtsNotEmpty();
-            this.AddAET(pc);
+            int pc = this.ObterPrimeiroNãoVazio();
+            this.AdicionarAET(pc);
             y = pc;
             try
             {
-                while(y < this.ET.Count - 1 || this.AET.Count > 0)
+                while (y < this.ET.Count - 1 || this.AET.Count > 0)
                 {
-                    this.RemoveMaxEqualY(y);
-                    AET.Sort((o1, o2) => 
-                        (o1.MinX == o2.MinX) ? 
-                        (o1.IncX.CompareTo(o2.IncX)) : 
+                    this.RemoverMaxEqualY(y);
+                    AET.Sort((o1, o2) =>
+                        (o1.MinX == o2.MinX) ?
+                        (o1.IncX.CompareTo(o2.IncX)) :
                         (o1.MinX.CompareTo(o2.MinX)));
-                    for(int i = 0; i < this.AET.Count - 1; i += 2)
+                    for (int i = 0; i < this.AET.Count - 1; i += 2)
                     {
                         arr1 = this.AET[i];
                         arr2 = this.AET[i + 1];
                         for (double x = arr1.MinX; x < arr2.MinX; x++)
                             this.SetPixel((int)x, y, cor, data);
                     }
-                    this.AttX();
+                    this.AtualizarX();
                     y++;
                     AET.Sort((o1, o2) =>
                         (o1.MinX == o2.MinX) ?
                         (o1.IncX.CompareTo(o2.IncX)) :
                         (o1.MinX.CompareTo(o2.MinX)));
-                    this.AddAET(y);
+                    this.AdicionarAET(y);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
@@ -201,18 +202,19 @@ namespace ProcessamentoImagens.Tools
             return Color.FromArgb(p[0], p[1], p[2]);
         }
 
-        public Bitmap Fill(Color cor, Bitmap img)
+        public Bitmap Preencher(Color cor, Bitmap img)
         {
-            int width = img.Width;
-            int height = img.Height;
-            BitmapData data = img.LockBits(new Rectangle(0, 0, width, height),
+            int largura = img.Width;
+            int altura = img.Height;
+            BitmapData data = img.LockBits(new Rectangle(0, 0, largura, altura),
                 ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
             unsafe
             {
-                this.Fill(cor, data);
+                this.Preencher(cor, data);
             }
             img.UnlockBits(data);
             return img;
         }
     }
 }
+

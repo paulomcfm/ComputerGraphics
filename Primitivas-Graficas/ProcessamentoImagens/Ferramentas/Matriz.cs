@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProcessamentoImagens
 {
-    class Matrix
+    class Matriz
     {
         public static double[] Homogenar(double[][] M1, double[] M2)
         {

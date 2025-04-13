@@ -23,7 +23,7 @@ namespace ProcessamentoImagens.Tools
             this.incX = incX;
         }
 
-        public void Add()
+        public void Adicionar()
         {
             this.minX = Convert.ToDouble(this.minX + this.incX);
         }
